@@ -216,7 +216,7 @@ class Transistor():
         tmp.topleft = topleft
         self.surf = par.surf.subsurface(tmp)
         self.surf.blit(self.im,(0,0))
-        self.out = AnalogeWaarde(self,5.0,(144,24))
+        self.out = AnalogeWaarde(self,5.0,(145,25))
         self.inA = AnalogeWaarde(self,0.0,(9,25))
         self.ins = [self.inA]
         self.outs=[self.out]
