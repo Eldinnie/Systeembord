@@ -99,3 +99,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+0.1.0/config.txt
+0.1.0/
+PYGAME2APP.py
+pygame2exe.py
