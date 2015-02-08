@@ -14,23 +14,8 @@ FPS = 60
 def buildBord():
     bord = klassiekBord()
     bord.init()
-    # cell = Memcel()
-    # schakelaarA = pygame.image.load("Drukknop.png").convert()
-    # recta = schakelaarA.get_rect()
-    # recta.topleft = (0,0)
-    # bord.blit(schakelaarA,recta)
-    # schakelaarB = pygame.image.load("Drukknop.png").convert()
-    # rect = schakelaarB.get_rect()
-    # rect.topleft = recta.bottomleft
-    # bord.blit(schakelaarB,rect)
-    # enInA = pygame.Rect(201,154,17,17)
-    # enInB = pygame.Rect(201,202,17,17)
-    # schakOutA = pygame.Rect(161,26,17,17)
-    # schakOutB = pygame.Rect(161,90,17,17)
-    # schakOutC = pygame.Rect(161,155,17,17)
-    # outs = [schakOutA, schakOutB, schakOutC]
-    # ins = [enInA, enInB]
     return bord, bord.ins, bord.outs
+
 def main():
     pygame.display.set_caption('Systeembord')
     line=None
