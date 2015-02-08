@@ -12,6 +12,7 @@ BLUE=(0,0,255)
 BLACK=(0,0,0)
 ACHTERGROND=(240,240,240)
 DARKBLUE=(0,0,102)
+FPS = 60
 beep = pygame.mixer.Sound(os.path.join("Items","Beep.wav"))
 def drawText(text,font,color):
     textSurf = font.render(text, True, color)
