@@ -8,17 +8,18 @@ Created on 19 jan. 2014
 import sys
 import objects
 from pygame.locals import *
-from objects.Objects import klassiekBord
+from objects.Objects import ClassicBord
 from objects import *
 
 
 def buildbord():
-    bord = klassiekBord()
+    bord = ClassicBord()
     bord.init()
     return bord, bord.ins, bord.outs
 
 
 def main():
+    display_surface = pygame.display.set_mode((200, 200))
     pygame.display.set_caption('Systeembord')
     line = None
     isdown = None
@@ -59,7 +60,7 @@ def main():
 
                 else:
                     # check to see if clicked on a button
-                    for i in [x for x in ins if x.__class__ == objects.Objects.KnopWaarde]:
+                    for i in [x for x in ins if x.__class__ == objects.Objects.ButtonValue]:
                         offset_x, offset_y = i.surf.get_abs_offset()
                         if i.surf.get_rect().collidepoint(cur[0] - offset_x, cur[1] - offset_y):
                             # if it's a button activate it.
@@ -91,8 +92,8 @@ def main():
                         # Valid is of the same data type (analog or digital)
                         if (i.surf.get_rect().collidepoint(current[0] - offset_x, current[1] - offset_y) and
                             ((startblokje.__class__ == i.__class__) or
-                            (startblokje.__class__ == objects.Objects.WaardeVakje and
-                            i.__class__ == objects.Objects.AanUitKnop))):
+                            (startblokje.__class__ == objects.Objects.ValueField and
+                            i.__class__ == objects.Objects.OnOffButtonValue))):
                             # if so, reset the temp start point
                             start = None
                             current = None
@@ -107,8 +108,8 @@ def main():
                             else:
                                 # add to the connection list and notify a special button
                                 bord.connections.append((startblokje, i))
-                                if i.__class__ == objects.Objects.AanUitKnop:
-                                    i.notifyconnect()
+                                if i.__class__ == objects.Objects.OnOffButtonValue:
+                                    i.notify_connect()
                                 change = True
                             break
                     # if it's not a valid output
@@ -135,7 +136,7 @@ def main():
             if event.type == MOUSEMOTION and sliding:
                 cur = event.pos
                 deltax = cur[0] - last_position[0]
-                sliding_block.set(sliding_block.calculateValue(deltax))
+                sliding_block.set(sliding_block.calculate_value(deltax))
                 last_position = cur
                 change = True
 
@@ -149,8 +150,8 @@ def main():
                         for i in range(len(bord.connections) - 1, -1, -1):
                             if bord.connections[i][0] == out:
                                 bord.connections[i][1].set(LOW)
-                                if bord.connections[i][1].__class__ == objects.Objects.AanUitKnop:
-                                    bord.connections[i][1].notifydisconnect()
+                                if bord.connections[i][1].__class__ == objects.Objects.OnOffButtonValue:
+                                    bord.connections[i][1].notify_disconnect()
                                 bord.connections.pop(i)
                                 change = True
                                 break
@@ -158,17 +159,17 @@ def main():
                 # Not an output that has a connection. switching buttons
                 else:
                     # print "switch knopstatus"
-                    for i in [x for x in ins if x.__class__ == objects.Objects.KnopWaarde]:
+                    for i in [x for x in ins if x.__class__ == objects.Objects.ButtonValue]:
                         offset_x, offset_y = i.surf.get_abs_offset()
                         if i.surf.get_rect().collidepoint(cur[0] - offset_x, cur[1] - offset_y):
-                            i.set(not i.waarde)
+                            i.set(not i.value)
                             change = True
                             break
 
             # checking if the clock ticked
             for i in range(1, 10, 1):
                 if event.type == USEREVENT + i:
-                    for out in [x for x in outs if x.__class__ == objects.Objects.WaardeVakje and x.id]:
+                    for out in [x for x in outs if x.__class__ == objects.Objects.ValueField and x.id]:
                         if out.id == i:
                             out.set(HIGH)
                             change = True
@@ -177,37 +178,37 @@ def main():
             # press r to reset board
             if event.type == KEYUP and event.key == K_r:
                 bord.connections = []
-                for i in [x for x in ins if x.__class__ == objects.Objects.WaardeVakje]:
+                for i in [x for x in ins if x.__class__ == objects.Objects.ValueField]:
                     i.set(HIGH)
                     i.set(LOW)
                 for i in [x for x in ins if x.__class__ == objects.Objects.Slider]:
                     i.set(2.5)
-                for out in [x for x in outs if x.__class__ == objects.Objects.WaardeVakje and x.id]:
+                for out in [x for x in outs if x.__class__ == objects.Objects.ValueField and x.id]:
                     out.par.inA.set(1)
         if change:
-            bord.loopconnections()
-            bord.loopconnections()
-            bord.loopconnections()
+            bord.loop_connections()
+            bord.loop_connections()
+            bord.loop_connections()
             change = False
-        DISPLAYSURF.fill(ACHTERGROND)
-        DISPLAYSURF.blit(bord.surf, bord.surf.get_rect())
-        fps = FPSCLOCK.get_fps()
-        surf, rect = drawText("FPS: " + str(fps), BASICFONT, RED)
+        display_surface.fill(BACKGROUND)
+        display_surface.blit(bord.surf, bord.surf.get_rect())
+        fps = fps_clock.get_fps()
+        surf, rect = draw_text("FPS: " + str(fps), font_small, RED)
         rect.bottomright = (720, 512)
-        DISPLAYSURF.blit(surf, rect)
+        display_surface.blit(surf, rect)
         # drawing connection
         for o, i in bord.connections:
             offset_x_out, offset_y_out = o.surf.get_abs_offset()
             offset_x_in, offset_y_in = i.surf.get_abs_offset()
             xo, yo = o.surf.get_rect().center
             xi, yi = i.surf.get_rect().center
-            pygame.draw.line(DISPLAYSURF, RED, (xo + offset_x_out, yo + offset_y_out),
+            pygame.draw.line(display_surface, RED, (xo + offset_x_out, yo + offset_y_out),
                              (xi + offset_x_in, yi + offset_y_in), 3)
 
         if line:
-            pygame.draw.line(DISPLAYSURF, RED, start, current)
+            pygame.draw.line(display_surface, RED, start, current)
         pygame.display.update()
-        FPSCLOCK.tick_busy_loop(FPS)
+        fps_clock.tick_busy_loop(FPS)
 
 
 def check_for_quit():
