@@ -8,13 +8,12 @@ Created on 19 jan. 2014
 import sys
 import objects
 from pygame.locals import *
-from objects.Objects import ClassicBord
+from objects.Objects import ClassicBoard
 from objects import *
 
 
 def buildbord():
-    bord = ClassicBord()
-    bord.init()
+    bord = ClassicBoard()
     return bord, bord.ins, bord.outs
 
 

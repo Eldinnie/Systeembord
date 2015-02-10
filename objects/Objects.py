@@ -11,7 +11,7 @@ from pygame.locals import *
 from objects import *
 
 
-class Bord(object):
+class Board(object):
     """Wrapper class for a Board.
 
    Attributes:
@@ -23,8 +23,7 @@ class Bord(object):
       surf (Surface): The Pygame.Surface for this board.
     """
     def __init__(self):
-        """
-        Set the simulation window to the appropriate size and initialize lists.
+        """Set the simulation window to the appropriate size and initialize lists.
         """
         # noinspection PyUnusedLocal
         display_surface = pygame.display.set_mode(self.size)
@@ -34,36 +33,37 @@ class Bord(object):
         self.items = []
         self.surf = pygame.Surface(self.size)
         self.surf.fill(BACKGROUND)
+        self._init()
 
-    def init(self):
-        """
-        Fill the ins and outs lists
+    def _init(self):
+        """Fill the ins and outs lists
+
+        called only and immediately after the creation of a Board instance
         """
         for it in self.items:
             self.ins.extend(it.ins)
             self.outs.extend(it.outs)
 
     def loop_connections(self):
-        """
-        Cycle through the connections list and set inputs to the same value as the connected output.
+        """Update the connections on the board
 
+        Cycle through the connections list and set inputs to the same value as the connected output.
         """
         for o, i in self.connections:
             i.set(o.value)
 
 
-class ClassicBord(Bord):
+class ClassicBoard(Board):
     """The classic Board
 
    Attributes:
       size (tuple): the dimensions of the board in (x, y)
     """
     def __init__(self):
-        """
-        Append all the items to the items list
+        """Append all the items to the items list
         """
         self.size = (720, 512)
-        Bord.__init__(self)
+        Board.__init__(self)
         self.items.append(Sensor(self, (0, 0)))
         self.items.append(Sensor(self, (0, 96)))
         self.items.append(Sensor(self, (0, 192)))
@@ -86,8 +86,16 @@ class ClassicBord(Bord):
 
 
 class BordItem(object):
+    """Wrapper for items on the Board
+    """
     def __init__(self, par, topleft):
+        """Set basic variables present in every item
 
+        Blits the Image as subsurface to the Board and initializes empty lists
+        Arguments:
+            par (objects.Objects.Board or children): The parent board this item is placed on
+            topleft (tulple): the topleft position on the board as ints (x, y)
+        """
         tmp = self.im.get_rect()
         tmp.topleft = topleft
         self.surf = par.surf.subsurface(tmp)
