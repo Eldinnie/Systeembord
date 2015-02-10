@@ -1,6 +1,5 @@
 import pygame
 import os
-from objects import Objects
 
 pygame.init()
 pygame.mixer.init()
