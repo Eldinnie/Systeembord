@@ -159,10 +159,7 @@ def main():
                             change = True
                             break
 
-
-
-
-                            # dragging mouse while started from an output
+        # dragging mouse while started from an output
         for event in pygame.event.get(MOUSEMOTION):
             if event.type == MOUSEMOTION and isdown and start:
                 current = event.pos
@@ -176,8 +173,7 @@ def main():
                 last_position = cur
                 change = True
 
-
-                # checking if the clock ticked
+        # checking if the clock ticked
         for i in range(1, 5, 1):
             if pygame.event.peek(USEREVENT + i):
                 event = pygame.event.get(USEREVENT + i)
