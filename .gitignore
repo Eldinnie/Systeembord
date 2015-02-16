@@ -103,3 +103,6 @@ $RECYCLE.BIN/
 0.1.0/
 PYGAME2APP.py
 pygame2exe.py
+*.name
+*.xml
+*.iml
