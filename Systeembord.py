@@ -8,13 +8,13 @@ Created on 19 jan. 2014
 import sys
 import objects
 from pygame.locals import *
-from objects.Objects import ClassicBoard
+from objects.Objects import ClassicBoard, NewBoard, TwoCounters
 from objects import *
 
 
-def buildbord():
-    bord = ClassicBoard()
-    return bord, bord.ins, bord.outs
+def buildbord(boardclass):
+    bord = boardclass()
+    return bord, bord.ins, bord.outs, bord.buttons
 
 
 def main():
@@ -24,7 +24,7 @@ def main():
     isdown = None
     start = None
     current = None
-    bord, ins, outs = buildbord()
+    bord, ins, outs, buttons = buildbord(ClassicBoard)
     startblokje = None
     change = False
     vasthoudknop = None
@@ -35,6 +35,7 @@ def main():
 
     while True:
         check_for_quit()
+
         if last_loop_ticked_pulses:
             for out in last_loop_ticked_pulses:
                 out.set(LOW)
@@ -42,7 +43,7 @@ def main():
             change = True
 
         # Get Left mouse button down
-        for event in pygame.event.get():
+        for event in pygame.event.get(MOUSEBUTTONDOWN):
             if event.type == MOUSEBUTTONDOWN and event.button == 1:
                 cur = event.pos
                 # check if it's on an output port
@@ -78,6 +79,7 @@ def main():
                             last_position = cur
 
             # check left mouse button up
+        for event in pygame.event.get(MOUSEBUTTONUP):
             if event.type == MOUSEBUTTONUP and event.button == 1:
                 current = event.pos
                 # if we're dragging it's an output, button or slider
@@ -90,9 +92,9 @@ def main():
                         # checking if the end of the drag is a valid input.
                         # Valid is of the same data type (analog or digital)
                         if (i.surf.get_rect().collidepoint(current[0] - offset_x, current[1] - offset_y) and
-                            ((startblokje.__class__ == i.__class__) or
-                            (startblokje.__class__ == objects.Objects.ValueField and
-                            i.__class__ == objects.Objects.OnOffButtonValue))):
+                                ((startblokje.__class__ == i.__class__) or
+                                     (startblokje.__class__ == objects.Objects.ValueField and
+                                              i.__class__ == objects.Objects.OnOffButtonValue))):
                             # if so, reset the temp start point
                             start = None
                             current = None
@@ -126,20 +128,12 @@ def main():
                     change = True
                     sliding = False
 
-            # dragging mouse while started from an output
-            if event.type == MOUSEMOTION and isdown and start:
-                current = event.pos
-                line = True
+                # Handling buttons
+                for button in buttons:
+                    if button[0].collidepoint(cur):
+                        pygame.event.post(button[1])
 
-            # dragging mouse when started on a slider
-            if event.type == MOUSEMOTION and sliding:
-                cur = event.pos
-                deltax = cur[0] - last_position[0]
-                sliding_block.set(sliding_block.calculate_value(deltax))
-                last_position = cur
-                change = True
-
-            # release of right mouse button
+                # release of right mouse button
             if event.type == MOUSEBUTTONUP and event.button == 3:
                 cur = event.pos
                 for out in outs:
@@ -165,27 +159,53 @@ def main():
                             change = True
                             break
 
-            # checking if the clock ticked
-            for i in range(1, 10, 1):
-                if event.type == USEREVENT + i:
-                    for out in [x for x in outs if x.__class__ == objects.Objects.ValueField and x.id]:
-                        if out.id == i:
-                            out.set(HIGH)
-                            change = True
-                            last_loop_ticked_pulses.append(out)
 
-            # press r to reset board
-            if event.type == KEYUP and event.key == K_r:
-                bord.connections = []
-                for i in [x for x in ins if x.__class__ == objects.Objects.ValueField]:
-                    i.set(HIGH)
-                    i.set(LOW)
-                for i in [x for x in ins if x.__class__ == objects.Objects.Slider]:
-                    i.set(2.5)
+
+
+            # dragging mouse while started from an output
+        for event in pygame.event.get(MOUSEMOTION):
+            if event.type == MOUSEMOTION and isdown and start:
+                current = event.pos
+                line = True
+
+            # dragging mouse when started on a slider
+            if event.type == MOUSEMOTION and sliding:
+                cur = event.pos
+                deltax = cur[0] - last_position[0]
+                sliding_block.set(sliding_block.calculate_value(deltax))
+                last_position = cur
+                change = True
+
+
+            # checking if the clock ticked
+        for i in range(1, 5, 1):
+            if pygame.event.peek(USEREVENT+i):
+                event = pygame.event.get(USEREVENT+i)
                 for out in [x for x in outs if x.__class__ == objects.Objects.ValueField and x.id]:
-                    out.par.inA.set(1)
+                    if out.id == i:
+                        out.set(HIGH)
+                        change = True
+                        last_loop_ticked_pulses.append(out)
+        
+        for event in pygame.event.get(USEREVENT):
+            if event.action == RESET:
+                    bord.connections = []
+                    for i in [x for x in ins if x.__class__ == objects.Objects.ValueField]:
+                        i.set(HIGH)
+                        i.set(LOW)
+                    for i in [x for x in ins if x.__class__ == objects.Objects.Slider]:
+                        i.set(2.5)
+                    for out in [x for x in outs if x.__class__ == objects.Objects.ValueField and x.id]:
+                        out.par.inA.set(1)
+
+            if event.action == BOARD:
+                if type(bord) == event.code:
+                    pass
+                else:
+                    bord, ins, outs, buttons = buildbord(event.code)
+                    pygame.event.post(pygame.event.Event(pygame.USEREVENT, action=RESET))
+
         if change:
-            bord.loop_connections()
             bord.loop_connections()
             bord.loop_connections()
             change = False
@@ -193,7 +213,7 @@ def main():
         display_surface.blit(bord.surf, bord.surf.get_rect())
         fps = fps_clock.get_fps()
         surf, rect = draw_text("FPS: " + str(fps), font_small, RED)
-        rect.bottomright = (720, 512)
+        rect.bottomright = (display_surface.get_rect().bottomright)
         display_surface.blit(surf, rect)
         # drawing connection
         for o, i in bord.connections:
@@ -207,7 +227,7 @@ def main():
         if line:
             pygame.draw.line(display_surface, RED, start, current)
         pygame.display.update()
-        fps_clock.tick_busy_loop(FPS)
+        # fps_clock.tick_busy_loop(FPS)
 
 
 def check_for_quit():

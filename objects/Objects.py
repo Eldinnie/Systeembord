@@ -24,16 +24,25 @@ class Board(object):
     """
     def __init__(self):
         """Set the simulation window to the appropriate size and initialize lists.
+
+        After setting this up it will call self._add_items() wich must be overridden by child.
+
         """
+        width, height = self.size
+        height += 50
+        self.size = (width,height)
         # noinspection PyUnusedLocal
         display_surface = pygame.display.set_mode(self.size)
         self.ins = []
         self.outs = []
         self.connections = []
         self.items = []
+        self.buttons= []
         self.surf = pygame.Surface(self.size)
         self.surf.fill(BACKGROUND)
+        self._add_items()
         self._init()
+        self._add_buttons()
 
     def _init(self):
         """Fill the ins and outs lists
@@ -43,6 +52,37 @@ class Board(object):
         for it in self.items:
             self.ins.extend(it.ins)
             self.outs.extend(it.outs)
+
+    def _add_items(self):
+        pass
+
+    def _add_buttons(self):
+        reset_surf,reset_rect = draw_text(" Reset ", font_medium, BLUE)
+        reset_rect.bottomleft = (4,self.size[1]-4)
+        self.surf.blit(reset_surf,reset_rect)
+        self.buttons.append((reset_rect,pygame.event.Event(pygame.USEREVENT, action=RESET)))
+        pygame.draw.rect(self.surf,BLACK,reset_rect,4)
+
+        classic_board_surf, classic_board_rect = draw_text(" Classic Board ", font_medium, BLUE)
+        classic_board_rect.bottomleft = self.buttons[-1][0].bottomright
+        classic_board_rect.left += 8
+        self.surf.blit(classic_board_surf, classic_board_rect)
+        self.buttons.append((classic_board_rect, pygame.event.Event(pygame.USEREVENT, action=BOARD, code=ClassicBoard)))
+        pygame.draw.rect(self.surf, BLACK, classic_board_rect, 4)
+
+        new_board_surf, new_board_rect = draw_text(" New Board ", font_medium, BLUE)
+        new_board_rect.bottomleft = self.buttons[-1][0].bottomright
+        new_board_rect.left += 8
+        self.surf.blit(new_board_surf, new_board_rect)
+        self.buttons.append((new_board_rect, pygame.event.Event(pygame.USEREVENT, action=BOARD, code=NewBoard)))
+        pygame.draw.rect(self.surf, BLACK, new_board_rect, 4)
+
+        twocounter_board_surf, twocounter_board_rect = draw_text(" Two counters ", font_medium, BLUE)
+        twocounter_board_rect.bottomleft = self.buttons[-1][0].bottomright
+        twocounter_board_rect.left += 8
+        self.surf.blit(twocounter_board_surf, twocounter_board_rect)
+        self.buttons.append((twocounter_board_rect, pygame.event.Event(pygame.USEREVENT,action=BOARD, code=TwoCounters)))
+        pygame.draw.rect(self.surf, BLACK, twocounter_board_rect, 4)
 
     def loop_connections(self):
         """Update the connections on the board
@@ -64,6 +104,8 @@ class ClassicBoard(Board):
         """
         self.size = (720, 512)
         Board.__init__(self)
+
+    def _add_items(self):
         self.items.append(Sensor(self, (0, 0)))
         self.items.append(Sensor(self, (0, 96)))
         self.items.append(Sensor(self, (0, 192)))
@@ -83,6 +125,78 @@ class ClassicBoard(Board):
         self.items.append(Buzzer(self, (528, 256)))
         self.items.append(Counter(self, (192, 384)))
         self.items.append(Explain(self, (528, 384)))
+
+
+class NewBoard(Board):
+    """The classic Board
+
+   Attributes:
+      size (tuple): the dimensions of the board in (x, y)
+    """
+    def __init__(self):
+        """Append all the items to the items list
+        """
+        self.size = (720, 512)
+        Board.__init__(self)
+
+    def _add_items(self):
+        self.items.append(Sensor(self, (0, 0)))
+        self.items.append(Sensor(self, (0, 96)))
+        self.items.append(PushButton(self, (0, 192)))
+        self.items.append(PushButton(self, (0, 256)))
+        self.items.append(Invertor(self, (24, 384)))
+        self.items.append(PulseGenerator(self, (0, 320), id=1))
+        self.items.append(Comperator(self, (360, 0)))
+        self.items.append(Comperator(self, (192, 0)))
+        self.items.append(AndPort(self, (192, 128)))
+        self.items.append(AndPort(self, (360, 128)))
+        self.items.append(MemoryCell(self, (192, 256)))
+        self.items.append(OrPort(self, (360, 256)))
+        self.items.append(Counter(self, (192, 384)))
+        self.items.append(LED(self, (528, 0)))
+        self.items.append(LED(self, (528, 64)))
+        self.items.append(LED(self, (528, 128)))
+        self.items.append(LED(self, (528, 192)))
+        self.items.append(Buzzer(self, (528, 256)))
+        self.items.append(Invertor(self, (528, 384)))
+
+
+class TwoCounters(Board):
+    """The classic Board
+
+   Attributes:
+      size (tuple): the dimensions of the board in (x, y)
+    """
+    def __init__(self):
+        """Append all the items to the items list
+        """
+        self.size = (888, 512)
+        Board.__init__(self)
+
+    def _add_items(self):
+        self.items.append(Sensor(self, (0, 0)))
+        self.items.append(Sensor(self, (0, 96)))
+        self.items.append(PushButton(self, (0, 192)))
+        self.items.append(PushButton(self, (0, 256)))
+        self.items.append(PulseGenerator(self, (0, 320), id=1))
+        self.items.append(Comperator(self, (360, 0)))
+        self.items.append(Comperator(self, (192, 0)))
+        self.items.append(AndPort(self, (192, 128)))
+        self.items.append(AndPort(self, (360, 128)))
+        self.items.append(MemoryCell(self, (192, 256)))
+        self.items.append(MemoryCell(self, (360, 256)))
+        self.items.append(OrPort(self, (528, 0)))
+        self.items.append(Invertor(self, (528, 128)))
+        self.items.append(Invertor(self, (528, 256)))
+        self.items.append(Counter(self, (0, 384)))
+        self.items.append(PulseGenerator(self, (360, 384), id=2))
+        self.items.append(Counter(self, (552, 384)))
+        self.items.append(LED(self, (696, 0)))
+        self.items.append(LED(self, (696, 64)))
+        self.items.append(LED(self, (696, 128)))
+        self.items.append(LED(self, (696, 192)))
+        self.items.append(Buzzer(self, (696, 256)))
+
 
 
 class BordItem(object):
