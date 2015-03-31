@@ -1,16 +1,26 @@
-__author__ = 'Pieter'
-'''
+#!/usr/bin/env python
+"""
 Created on 19 jan. 2014
 
-@author: Pieter
-'''
+@author: Pieter Schutz
+Licensed with GPL.
+
+"""
 
 import sys
-import objects
 from pygame.locals import *
+import objects
 from objects.Objects import ClassicBoard, NewBoard, TwoCounters
 from objects import *
 
+__author__ = "Pieter Schutz"
+__copyright__ = "Copyright 2015, Pieter Schutz"
+__credits__ = ["Pieter Schutz"]
+__license__ = "GPL"
+__version__ = "0.2.0"
+__maintainer__ = "Pieter Schutz"
+__email__ = "schutz@ggh.nu"
+__status__ = "Development"
 
 def buildbord(boardclass):
     bord = boardclass()
