@@ -18,6 +18,7 @@ lib64/
 parts/
 sdist/
 var/
+0.2.0/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -106,7 +107,6 @@ pygame2exe.py
 *.name
 *.xml
 *.iml
-*.zip
-0.2.0/Systeembord020.exe
 *.sbs
+Systeembord.zip
 test
