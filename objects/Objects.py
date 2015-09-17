@@ -12,9 +12,10 @@ from objects import *
 
 
 class Board(object):
-    """Wrapper class for a Board.
+    """
+    Wrapper class for a Board.
 
-   Attributes:
+    Attributes:
       ins (list of ValueField or children): All inputs on this Board.
       outs (list of ValueField or children): All inputs on this Board.
       outs (list of ValueField or children): All inputs on this Board.
@@ -22,22 +23,25 @@ class Board(object):
       items (list of BordItem children): The items the board is build with.
       surf (Surface): The Pygame.Surface for this board.
     """
+
     def __init__(self):
-        """Set the simulation window to the appropriate size and initialize lists.
+        """
+        Set the simulation window to the appropriate size and initialize lists.
 
         After setting this up it will call self._add_items() wich must be overridden by child.
-
         """
         width, height = self.size
+        self.idgen = self.gen(0)
         height += 50
-        self.size = (width,height)
+        self.size = (width, height)
         # noinspection PyUnusedLocal
         display_surface = pygame.display.set_mode(self.size)
         self.ins = []
         self.outs = []
+        self.itemdict = {}
         self.connections = []
         self.items = []
-        self.buttons= []
+        self.buttons = []
         self.surf = pygame.Surface(self.size)
         self.surf.fill(BACKGROUND)
         self._add_items()
@@ -45,23 +49,35 @@ class Board(object):
         self._add_buttons()
 
     def _init(self):
-        """Fill the ins and outs lists
+        """
+        Fill the ins and outs lists
 
-        called only and immediately after the creation of a Board instance
+        Called only and immediately after the creation of a Board instance
         """
         for it in self.items:
             self.ins.extend(it.ins)
             self.outs.extend(it.outs)
+            for i in it.ins:
+                self.itemdict[i.id] = i
+            for i in it.outs:
+                self.itemdict[i.id] = i
 
     def _add_items(self):
+        """
+        Placeholder. Must be overwritten by child to add items to a Board.
+        """
         pass
 
     def _add_buttons(self):
-        reset_surf,reset_rect = draw_text(" Reset ", font_medium, BLUE)
-        reset_rect.bottomleft = (4,self.size[1]-4)
-        self.surf.blit(reset_surf,reset_rect)
-        self.buttons.append((reset_rect,pygame.event.Event(pygame.USEREVENT, action=RESET)))
-        pygame.draw.rect(self.surf,BLACK,reset_rect,4)
+        """
+        Buttons for switching board types and resetting.
+        Should be replaced with a proper menu one day.
+        """
+        reset_surf, reset_rect = draw_text(" Reset ", font_medium, BLUE)
+        reset_rect.bottomleft = (4, self.size[1] - 4)
+        self.surf.blit(reset_surf, reset_rect)
+        self.buttons.append((reset_rect, pygame.event.Event(pygame.USEREVENT, action=RESET)))
+        pygame.draw.rect(self.surf, BLACK, reset_rect, 4)
 
         classic_board_surf, classic_board_rect = draw_text(" Classic Board ", font_medium, BLUE)
         classic_board_rect.bottomleft = self.buttons[-1][0].bottomright
@@ -81,31 +97,68 @@ class Board(object):
         twocounter_board_rect.bottomleft = self.buttons[-1][0].bottomright
         twocounter_board_rect.left += 8
         self.surf.blit(twocounter_board_surf, twocounter_board_rect)
-        self.buttons.append((twocounter_board_rect, pygame.event.Event(pygame.USEREVENT,action=BOARD, code=TwoCounters)))
+        self.buttons.append(
+            (twocounter_board_rect, pygame.event.Event(pygame.USEREVENT, action=BOARD, code=TwoCounters)))
         pygame.draw.rect(self.surf, BLACK, twocounter_board_rect, 4)
 
+        save_surf, save_rect = draw_text(" Save ", font_medium, BLUE)
+        save_rect.bottomleft = self.buttons[-1][0].bottomright
+        save_rect.left += 8
+        self.surf.blit(save_surf, save_rect)
+        self.buttons.append((save_rect, pygame.event.Event(pygame.USEREVENT, action=SAVE)))
+        pygame.draw.rect(self.surf, BLACK, save_rect, 4)
+
+        load_surf, load_rect = draw_text(" Load ", font_medium, BLUE)
+        load_rect.bottomleft = self.buttons[-1][0].bottomright
+        load_rect.left += 8
+        self.surf.blit(load_surf, load_rect)
+        self.buttons.append((load_rect, pygame.event.Event(pygame.USEREVENT, action=LOAD)))
+        pygame.draw.rect(self.surf, BLACK, load_rect, 4)
+
     def loop_connections(self):
-        """Update the connections on the board
+        """
+        Update the connections on the board
 
         Cycle through the connections list and set inputs to the same value as the connected output.
         """
         for o, i in self.connections:
-            i.set(o.value)
+            self.itemdict[i].set(self.itemdict[o].value)
+
+    def __repr__(self):
+        vals = {}
+        for id, item in self.itemdict.items():
+            vals[id] = item.value
+        return "{'board':" + self.__class__.__name__ + ", 'connections':" + repr(
+            self.connections) + ", 'values':" + repr(vals) + "}"
+
+    def gen(self, n):
+        num = n
+        while True:
+            yield num
+            num += 1
 
 
 class ClassicBoard(Board):
-    """The classic Board
+    """
+    The classic Board
 
-   Attributes:
+    Attributes:
       size (tuple): the dimensions of the board in (x, y)
     """
+
     def __init__(self):
-        """Append all the items to the items list
         """
+        Set the board size and initiate the inherited attributes
+        """
+
         self.size = (720, 512)
         Board.__init__(self)
 
     def _add_items(self):
+        """
+        Add all items to this Board
+        """
+
         self.items.append(Sensor(self, (0, 0)))
         self.items.append(Sensor(self, (0, 96)))
         self.items.append(Sensor(self, (0, 192)))
@@ -128,18 +181,25 @@ class ClassicBoard(Board):
 
 
 class NewBoard(Board):
-    """The classic Board
+    """
+    The new Board
 
-   Attributes:
+    Attributes:
       size (tuple): the dimensions of the board in (x, y)
     """
+
     def __init__(self):
-        """Append all the items to the items list
+        """
+        Set the board size and initiate the inherited attributes
         """
         self.size = (720, 512)
         Board.__init__(self)
 
     def _add_items(self):
+        """
+        Add all items to this Board
+        """
+
         self.items.append(Sensor(self, (0, 0)))
         self.items.append(Sensor(self, (0, 96)))
         self.items.append(PushButton(self, (0, 192)))
@@ -162,18 +222,24 @@ class NewBoard(Board):
 
 
 class TwoCounters(Board):
-    """The classic Board
-
-   Attributes:
+    """
+    A modified board with two Counters
+    Attributes:
       size (tuple): the dimensions of the board in (x, y)
     """
+
     def __init__(self):
-        """Append all the items to the items list
+        """
+        Set the board size and initiate the inherited attributes
         """
         self.size = (888, 512)
         Board.__init__(self)
 
     def _add_items(self):
+        """
+        Add all items to this Board
+        """
+
         self.items.append(Sensor(self, (0, 0)))
         self.items.append(Sensor(self, (0, 96)))
         self.items.append(PushButton(self, (0, 192)))
@@ -198,18 +264,28 @@ class TwoCounters(Board):
         self.items.append(Buzzer(self, (696, 256)))
 
 
-
 class BordItem(object):
-    """Wrapper for items on the Board
     """
+    Wrapper for items on the Board
+
+    Attributes:
+      ins (list of ValueField or children): All inputs on this Board.
+      outs (list of ValueField or children): All inputs on this Board.
+      outs (list of ValueField or children): All inputs on this Board.
+      surf (pygame.Surface): A subsurface where this item will be drawn.
+    """
+
     def __init__(self, par, topleft):
-        """Set basic variables present in every item
+        """
+        Set basic variables present in every item
 
         Blits the Image as subsurface to the Board and initializes empty lists
         Arguments:
             par (objects.Objects.Board or children): The parent board this item is placed on
             topleft (tulple): the topleft position on the board as ints (x, y)
         """
+        self.par = par
+        self.topleft = topleft
         tmp = self.im.get_rect()
         tmp.topleft = topleft
         self.surf = par.surf.subsurface(tmp)
@@ -219,7 +295,18 @@ class BordItem(object):
 
 
 class Sensor(BordItem):
-    def __init__(self, par, topleft):
+    """
+    The Sensor utilizes a Sensor imitator on the board.
+    A Slider dat can change it's output to be between 0.0V - 5.0V
+
+    Attributes:
+      inA[, inB[, inC]] (Valuefield or Child) Input to this BordItem. Will be populating s.ins
+      outA[, outB[, outC[, outD]]]] (Valuefield or Child) output from this BordItem. Will be populating s.outs
+      im (pygame.Surface) The image representing this item.
+
+    """
+
+    def __init__(self, par, topleft=(0, 0)):
         self.im = pygame.image.load(os.path.join("Items", "Sensor.png")).convert()
         BordItem.__init__(self, par, topleft)
         self.out = AnalogValue(self, 0.0, (161, 41))
@@ -259,7 +346,7 @@ class PulseGenerator(BordItem):
         self.im = pygame.image.load(os.path.join("Items", "Pulsgenerator.png")).convert()
         BordItem.__init__(self, par, topleft)
         self.inA = Slider(self, 1, (12, 24), mini=1, maxi=10)
-        self.out = ValueField(self, LOW, (160, 24), id_num=self.id)
+        self.out = ValueField(self, LOW, (160, 24), countid=str(self.id))
         self.ins = [self.inA]
         self.outs = [self.out]
         self.lasttextrect = (2, 2, 1, 1)
@@ -311,12 +398,12 @@ class Explain(BordItem):
 
 
 class MemoryCell(BordItem):
-    def __init__(self, par, topleft):
+    def __init__(self, par, topleft, inA="None", inB="None", out="None"):
         self.im = pygame.image.load(os.path.join("Items", "Geheugencel.png")).convert()
         BordItem.__init__(self, par, topleft)
-        self.inA = ValueField(self, LOW, (8, 24))
-        self.inB = ValueField(self, LOW, (8, 72))
-        self.out = ValueField(self, LOW, (144, 48))
+        self.inA = eval(inA) or ValueField(self, LOW, (8, 24))
+        self.inB = eval(inB) or ValueField(self, LOW, (8, 72))
+        self.out = eval(out) or ValueField(self, LOW, (144, 48))
         self.ins = [self.inA, self.inB]
         self.outs = [self.out]
 
@@ -325,6 +412,11 @@ class MemoryCell(BordItem):
             self.out.set(HIGH)
         elif self.inB.value:
             self.out.set(LOW)
+
+    def __repr__(self):
+        # print "MemoryCell"
+        return "MemoryCell(self, " + repr(self.topleft) + ", " + repr(self.inA) + \
+               ", " + repr(self.inB) + ", " + repr(self.out) + ")"
 
 
 class AndPort(BordItem):
@@ -369,7 +461,7 @@ class Invertor(BordItem):
 
 
 class Transistor(BordItem):
-    def __init__(self, par, topleft):
+    def __init__(self, par, topleft=(0, 0)):
         self.im = pygame.image.load(os.path.join("Items", "Transistor.png")).convert()
         BordItem.__init__(self, par, topleft)
         self.out = AnalogValue(self, 5.0, (145, 25))
@@ -455,14 +547,15 @@ class Counter(BordItem):
 
 
 class ValueField(object):
-    def __init__(self, par, value, topleft, id_num=None):
-        self.id = id_num
+    def __init__(self, par, value, topleft, countid="None"):
+        self.countid = eval(countid)
         self.value = value
         self.aan = pygame.image.load(os.path.join("Items", "WaardeVakjeAan.png"))
         self.uit = pygame.image.load(os.path.join("Items", "WaardevakjeUit.png"))
         tmp_rect = self.uit.get_rect()
         tmp_rect.topleft = topleft
         self.par = par
+        self.id = self.par.par.idgen.next()
         self.surf = self.par.surf.subsurface(tmp_rect)
         self.topleft = topleft
         self.refresh()
@@ -504,11 +597,13 @@ class ButtonValue(ValueField):
 
 class AnalogValue(ValueField):
     def __init__(self, par, value, topleft):
+        self.par = par
+        self.id = self.par.par.idgen.next()
+        self.topleft = topleft
         self.value = value
         self.im = pygame.Surface((15, 15))
         self.tmprect = self.im.get_rect()
         self.tmprect.topleft = topleft
-        self.par = par
         self.surf = self.par.surf.subsurface(self.tmprect)
         self.refresh()
 
@@ -525,6 +620,7 @@ class Slider(ValueField):
         self.mini = mini
         self.maxi = maxi
         self.par = par
+        self.id = self.par.par.idgen.next()
         self.topleft = topleft
         self.im = pygame.image.load(os.path.join("Items", "Sliderachtergrond.png")).convert()
         self.button = pygame.Surface((15, 15))
@@ -552,5 +648,3 @@ class Slider(ValueField):
         if val < self.mini: val = self.mini
         if val > self.maxi: val = self.maxi
         return val
-
-
