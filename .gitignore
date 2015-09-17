@@ -106,3 +106,7 @@ pygame2exe.py
 *.name
 *.xml
 *.iml
+*.zip
+0.2.0/Systeembord020.exe
+*.sbs
+test
