@@ -78,7 +78,7 @@ def main():
                             sliding = True
                             last_position = cur
 
-            # check left mouse button up
+                            # check left mouse button up
         for event in pygame.event.get(MOUSEBUTTONUP):
             if event.type == MOUSEBUTTONUP and event.button == 1:
                 current = event.pos
@@ -133,7 +133,7 @@ def main():
                     if button[0].collidepoint(cur):
                         pygame.event.post(button[1])
 
-                # release of right mouse button
+                        # release of right mouse button
             if event.type == MOUSEBUTTONUP and event.button == 3:
                 cur = event.pos
                 for out in outs:
@@ -159,10 +159,7 @@ def main():
                             change = True
                             break
 
-
-
-
-            # dragging mouse while started from an output
+        # dragging mouse while started from an output
         for event in pygame.event.get(MOUSEMOTION):
             if event.type == MOUSEMOTION and isdown and start:
                 current = event.pos
@@ -176,27 +173,26 @@ def main():
                 last_position = cur
                 change = True
 
-
-            # checking if the clock ticked
+        # checking if the clock ticked
         for i in range(1, 5, 1):
-            if pygame.event.peek(USEREVENT+i):
-                event = pygame.event.get(USEREVENT+i)
+            if pygame.event.peek(USEREVENT + i):
+                event = pygame.event.get(USEREVENT + i)
                 for out in [x for x in outs if x.__class__ == objects.Objects.ValueField and x.id]:
                     if out.id == i:
                         out.set(HIGH)
                         change = True
                         last_loop_ticked_pulses.append(out)
-        
+
         for event in pygame.event.get(USEREVENT):
             if event.action == RESET:
-                    bord.connections = []
-                    for i in [x for x in ins if x.__class__ == objects.Objects.ValueField]:
-                        i.set(HIGH)
-                        i.set(LOW)
-                    for i in [x for x in ins if x.__class__ == objects.Objects.Slider]:
-                        i.set(2.5)
-                    for out in [x for x in outs if x.__class__ == objects.Objects.ValueField and x.id]:
-                        out.par.inA.set(1)
+                bord.connections = []
+                for i in [x for x in ins if x.__class__ == objects.Objects.ValueField]:
+                    i.set(HIGH)
+                    i.set(LOW)
+                for i in [x for x in ins if x.__class__ == objects.Objects.Slider]:
+                    i.set(2.5)
+                for out in [x for x in outs if x.__class__ == objects.Objects.ValueField and x.id]:
+                    out.par.inA.set(1)
 
             if event.action == BOARD:
                 if type(bord) == event.code:
