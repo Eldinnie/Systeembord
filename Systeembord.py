@@ -225,11 +225,10 @@ def main():
                     bord, ins, outs, buttons = buildbord(event.code)
                     pygame.event.post(pygame.event.Event(pygame.USEREVENT, action=RESET))
             if event.action == SAVE:
-                options = {}
-                options['defaultextension'] = ".sbs"
-                options['filetypes'] = [('systeembord files', '.sbs'), ('all files', '.*')]
-                options['title'] = 'Opslaan'
-                options['initialfile'] = bord.__class__.__name__+'.sbs'
+                options = {'defaultextension': ".sbs",
+                           'filetypes': [('systeembord files', '.sbs'), ('all files', '.*')],
+                           'title': 'Opslaan',
+                           'initialfile': bord.__class__.__name__ + '.sbs'}
                 root = tk.Tk()
                 root.withdraw()
                 file_path = asksaveasfilename(**options)

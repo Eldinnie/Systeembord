@@ -9,6 +9,7 @@ Cannot be used standalone.
 """
 from pygame.locals import *
 from objects import *
+from objects import resource_path
 
 
 class Board(object):
@@ -307,7 +308,7 @@ class Sensor(BordItem):
     """
 
     def __init__(self, par, topleft=(0, 0)):
-        self.im = pygame.image.load(os.path.join("Items", "Sensor.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Sensor.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.out = AnalogValue(self, 0.0, (161, 41))
         self.inA = Slider(self, 2.5, (12, 41))
@@ -329,7 +330,7 @@ class Sensor(BordItem):
 
 class PushButton(BordItem):
     def __init__(self, par, topleft):
-        self.im = pygame.image.load(os.path.join("Items", "Drukknop.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Drukknop.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.out = ValueField(self, LOW, (160, 24))
         self.inA = ButtonValue(self, LOW, (16, 24))
@@ -343,7 +344,7 @@ class PushButton(BordItem):
 class PulseGenerator(BordItem):
     def __init__(self, par, topleft, id=1):
         self.id = id
-        self.im = pygame.image.load(os.path.join("Items", "Pulsgenerator.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Pulsgenerator.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.inA = Slider(self, 1, (12, 24), mini=1, maxi=10)
         self.out = ValueField(self, LOW, (160, 24), countid=str(self.id))
@@ -365,8 +366,8 @@ class PulseGenerator(BordItem):
 
 class LED(BordItem):
     def __init__(self, par, topleft):
-        self.im = pygame.image.load(os.path.join("Items", "Led.png")).convert()
-        self.aan = pygame.image.load(os.path.join("Items", "Ledaan.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Led.png"))).convert()
+        self.aan = pygame.image.load(resource_path(os.path.join("Items", "Ledaan.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.inA = ValueField(self, LOW, (16, 24))
         self.ins = [self.inA]
@@ -379,7 +380,7 @@ class LED(BordItem):
 
 class Buzzer(BordItem):
     def __init__(self, par, topleft):
-        self.im = pygame.image.load(os.path.join("Items", "Zoemer.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Zoemer.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.inA = ValueField(self, LOW, (16, 48))
         self.ins = [self.inA]
@@ -393,13 +394,13 @@ class Buzzer(BordItem):
 
 class Explain(BordItem):
     def __init__(self, par, topleft):
-        self.im = pygame.image.load(os.path.join("Items", "Uitleg.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Uitleg.png"))).convert()
         BordItem.__init__(self, par, topleft)
 
 
 class MemoryCell(BordItem):
     def __init__(self, par, topleft, inA="None", inB="None", out="None"):
-        self.im = pygame.image.load(os.path.join("Items", "Geheugencel.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Geheugencel.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.inA = eval(inA) or ValueField(self, LOW, (8, 24))
         self.inB = eval(inB) or ValueField(self, LOW, (8, 72))
@@ -421,7 +422,7 @@ class MemoryCell(BordItem):
 
 class AndPort(BordItem):
     def __init__(self, par, topleft):
-        self.im = pygame.image.load(os.path.join("Items", "Enpoort.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Enpoort.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.inA = ValueField(self, LOW, (8, 24))
         self.inB = ValueField(self, LOW, (8, 72))
@@ -435,7 +436,7 @@ class AndPort(BordItem):
 
 class OrPort(BordItem):
     def __init__(self, par, topleft):
-        self.im = pygame.image.load(os.path.join("Items", "Ofpoort.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Ofpoort.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.inA = ValueField(self, LOW, (8, 24))
         self.inB = ValueField(self, LOW, (8, 72))
@@ -449,7 +450,7 @@ class OrPort(BordItem):
 
 class Invertor(BordItem):
     def __init__(self, par, topleft):
-        self.im = pygame.image.load(os.path.join("Items", "Invertor.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Invertor.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.inA = ValueField(self, LOW, (8, 48))
         self.out = ValueField(self, HIGH, (144, 48))
@@ -462,7 +463,7 @@ class Invertor(BordItem):
 
 class Transistor(BordItem):
     def __init__(self, par, topleft=(0, 0)):
-        self.im = pygame.image.load(os.path.join("Items", "Transistor.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Transistor.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.out = AnalogValue(self, 5.0, (145, 25))
         self.inA = AnalogValue(self, 0.0, (9, 25))
@@ -476,7 +477,7 @@ class Transistor(BordItem):
 
 class Comperator(BordItem):
     def __init__(self, par, topleft):
-        self.im = pygame.image.load(os.path.join("Items", "Comperator.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Comperator.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.out = ValueField(self, LOW, (144, 24))
         self.inA = AnalogValue(self, 0.0, (9, 25))
@@ -501,7 +502,7 @@ class Counter(BordItem):
     def __init__(self, par, topleft):
         self.counter = 0
         self.previous_high = False
-        self.im = pygame.image.load(os.path.join("Items", "Teller.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Teller.png"))).convert()
         BordItem.__init__(self, par, topleft)
         self.inA = ValueField(self, LOW, (16, 16))
         self.inB = OnOffButtonValue(self, LOW, (16, 48))
@@ -550,8 +551,8 @@ class ValueField(object):
     def __init__(self, par, value, topleft, countid="None"):
         self.countid = eval(countid)
         self.value = value
-        self.aan = pygame.image.load(os.path.join("Items", "WaardeVakjeAan.png"))
-        self.uit = pygame.image.load(os.path.join("Items", "WaardevakjeUit.png"))
+        self.aan = pygame.image.load(resource_path(os.path.join("Items", "WaardeVakjeAan.png")))
+        self.uit = pygame.image.load(resource_path(os.path.join("Items", "WaardevakjeUit.png")))
         tmp_rect = self.uit.get_rect()
         tmp_rect.topleft = topleft
         self.par = par
@@ -622,7 +623,7 @@ class Slider(ValueField):
         self.par = par
         self.id = self.par.par.idgen.next()
         self.topleft = topleft
-        self.im = pygame.image.load(os.path.join("Items", "Sliderachtergrond.png")).convert()
+        self.im = pygame.image.load(resource_path(os.path.join("Items", "Sliderachtergrond.png"))).convert()
         self.button = pygame.Surface((15, 15))
         self.button.fill(BLUE)
         self.image_rect = self.im.get_rect()
