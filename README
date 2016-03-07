@@ -1,3 +1,10 @@
-This is a simulation for systeembord by CMA.
+# Systeembord
+======================
 
-Developed under GNU Public Licence (c) Pieter Schutz
+Systeembord emulator is een vernieuwde versie om het systeembord te emuleren.
+ondersteunde functies:
+- Verschillende borden
+- meerdere connectie uit één uitgang
+- sliders voor de sensors
+- opslaan en laden van borden
+
