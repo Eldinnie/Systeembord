@@ -15,4 +15,4 @@ Tree('C:\\Users\\Pieter\\CloudStation\\GIT projecten no sync\\Systeembord\\Items
           debug=False,
           strip=None,
           upx=True,
-          console=True )
+          console=False )
