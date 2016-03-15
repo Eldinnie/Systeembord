@@ -551,7 +551,7 @@ class ValueField(object):
     def __init__(self, par, value, topleft, countid="None"):
         self.countid = eval(countid)
         self.value = value
-        self.aan = pygame.image.load(resource_path(os.path.join("Items", "WaardeVakjeAan.png")))
+        self.aan = pygame.image.load(resource_path(os.path.join("Items", "WaardevakjeAan.png")))
         self.uit = pygame.image.load(resource_path(os.path.join("Items", "WaardevakjeUit.png")))
         tmp_rect = self.uit.get_rect()
         tmp_rect.topleft = topleft
